@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -18,6 +19,10 @@ class Product extends Model
         return [
             'unit_price' => 'decimal:2',
         ];
+    }
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new TenantScope);
     }
 
     public function tenant()

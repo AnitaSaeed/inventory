@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Model;
 
 class StockMovement extends Model
@@ -22,6 +23,10 @@ class StockMovement extends Model
             'quantity' => 'decimal:3',
             'meta' => 'array',
         ];
+    }
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new TenantScope);
     }
 
     public function tenant()

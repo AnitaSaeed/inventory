@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Model;
 
 class StockLevel extends Model
@@ -21,7 +22,10 @@ class StockLevel extends Model
             'updated_at' => 'datetime',
         ];
     }
-
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new TenantScope);
+    }
     public function tenant()
     {
         return $this->belongsTo(Tenant::class,'tenant_id','id');

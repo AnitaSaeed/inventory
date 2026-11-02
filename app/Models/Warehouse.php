@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Model;
 
 class Warehouse extends Model
@@ -11,6 +12,10 @@ class Warehouse extends Model
         'name',
         'location',
     ];
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new TenantScope);
+    }
 
     public function tenant()
     {
