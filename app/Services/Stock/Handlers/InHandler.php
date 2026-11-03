@@ -19,9 +19,18 @@ class InHandler implements MovementHandler
         ?string $reference = null,
         ?array $meta = null
     ): void {
-        $this->validateOwnership($tenantId, $productId, $warehouseId);
 
-        DB::transaction(function () use ($tenantId, $productId, $warehouseId, $quantity, $reference, $meta) {
+        DB::transaction(function () use (
+            $tenantId,
+            $productId,
+            $warehouseId,
+            $quantity,
+            $reference,
+            $meta
+        ) {
+
+            $this->validateOwnership($tenantId, $productId, $warehouseId);
+
             $level = StockLevel::firstOrCreate(
                 [
                     'tenant_id' => $tenantId,
@@ -31,9 +40,7 @@ class InHandler implements MovementHandler
                 ['quantity' => 0]
             );
 
-            $level->forceFill([
-                'quantity' => $level->quantity + $quantity,
-            ])->save();
+            $level->increment('quantity', $quantity);
 
             StockMovement::create([
                 'tenant_id' => $tenantId,
@@ -47,16 +54,28 @@ class InHandler implements MovementHandler
         });
     }
 
-    protected function validateOwnership(string $tenantId, int $productId, int $warehouseId): void
-    {
-        $exists = Product::where('tenant_id', $tenantId)
-            ->where('id', $productId)
-            ->exists() && Warehouse::where('tenant_id', $tenantId)
-            ->where('id', $warehouseId)
-            ->exists();
+    protected function validateOwnership(
+        string $tenantId,
+        int $productId,
+        int $warehouseId
+    ): void {
 
-        if (! $exists) {
-            throw new \InvalidArgumentException('Product or warehouse does not belong to this tenant');
+        if (! Product::where('tenant_id', $tenantId)
+            ->where('id', $productId)
+            ->exists()) {
+
+            throw new \InvalidArgumentException(
+                'Product does not belong to this tenant'
+            );
+        }
+
+        if (! Warehouse::where('tenant_id', $tenantId)
+            ->where('id', $warehouseId)
+            ->exists()) {
+
+            throw new \InvalidArgumentException(
+                'Warehouse does not belong to this tenant'
+            );
         }
     }
 }
