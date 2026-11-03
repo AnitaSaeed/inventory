@@ -9,5 +9,6 @@ Route::middleware('tenant')->get('/test-tenant', function () {
 Route::middleware(['api', \App\Http\Middleware\ResolveTenant::class, \App\Http\Middleware\GlobalTenantScope::class])->group(function () {
     Route::get('/stock-levels', [\App\Http\Controllers\StockLevelController::class, 'index']);
     Route::post('/stock-movements', \App\Http\Controllers\StockMovementController::class);
+    Route::get('/products/{sku}/history', \App\Http\Controllers\ProductHistoryController::class);
 
 });
