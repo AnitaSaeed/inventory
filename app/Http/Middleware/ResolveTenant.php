@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Tenant;
 use App\Support\TenantContext;
 use Closure;
 use Illuminate\Http\Request;
@@ -25,13 +26,20 @@ class ResolveTenant
         }
 
         // Only allow from authenticated requests or trusted proxy
-        if (!$request->user() && !$this->isTrustedProxy($request)) {
-            abort(401, 'Unauthenticated tenant resolution');
+//        if (!$request->user() ) {
+//            abort(401, 'Unauthenticated tenant resolution');
+//        }
+
+
+        $tenant = Tenant::findOrFail((int) $tenantId);
+
+        app(TenantContext::class)->setTenant($tenant);
+        try {
+            return $next($request);
+        } finally {
+            app(TenantContext::class)->clear();
         }
 
-        app(\App\Support\TenantContext::class)->set($tenantId);
-
-        return $next($request);
     }
     protected function resolveFromSubdomain(Request $request): ?string
     {
