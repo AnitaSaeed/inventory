@@ -2,34 +2,29 @@
 
 namespace App\Support;
 
-use App\Models\Tenant;
+use Illuminate\Contracts\Container\Container;
 
 class TenantContext
 {
-    protected ?Tenant $tenant = null;
+    protected ?string $tenantId = null;
 
-    public function setTenant(Tenant $tenant): void
-    {
-        $this->tenant = $tenant;
-    }
+    public function __construct(protected Container $container) {}
 
-    public function getTenant(): ?Tenant
-    {
-        return $this->tenant;
-    }
+public function set(string $tenantId): void
+{
+    $this->tenantId = $tenantId;
+}
 
-    public function getTenantId(): ?int
-    {
-        return $this->tenant->id;
+public function current(): string
+{
+    if ($this->tenantId === null) {
+        throw new \RuntimeException('Tenant context is not set. Middleware must run first.');
     }
+    return $this->tenantId;
+}
 
-    public function hasTenant(): bool
-    {
-        return $this->tenant !== null;
-    }
-
-    public function clear(): void
-    {
-        $this->tenant = null;
-    }
+public function clear(): void
+{
+    $this->tenantId = null;
+}
 }

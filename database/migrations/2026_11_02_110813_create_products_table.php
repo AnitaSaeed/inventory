@@ -21,6 +21,8 @@ return new class extends Migration
             $table->decimal('unit_price', 12, 2);
             $table->unique(['tenant_id', 'sku']);
             $table->timestamps();
+            $table->unique(['tenant_id', 'id']);
+
         });
     }
 

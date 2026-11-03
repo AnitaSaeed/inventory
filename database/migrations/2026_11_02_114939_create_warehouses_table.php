@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->index(['tenant_id', 'name']);
             $table->timestamps();
+            $table->unique(['tenant_id', 'id']);
+
         });
     }
 

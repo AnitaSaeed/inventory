@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('reference')->nullable();
             $table->json('meta')->nullable();
             $table->timestamps();
+            $table->index(['tenant_id', 'product_id', 'id']);
         });
     }
 
